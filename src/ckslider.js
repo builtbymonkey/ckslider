@@ -1,13 +1,5 @@
 /*global jQuery */
 
-/*
- * ckslider
- * https://github.com/ckimrie/ckslider
- *
- * Copyright (c) 2013 Christopher Imrie
- * Licensed under the MIT license.
- */
-
 (function () {
 	var defaults = {
 			'fadeInDuration' : 800,
