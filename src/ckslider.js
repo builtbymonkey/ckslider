@@ -1,4 +1,4 @@
-/*global $ */
+/*global jQuery */
 
 /*
  * ckslider
@@ -22,7 +22,7 @@
 			'zIndexLayer3' : 15,
 			'pauseOnClick' : true,
 			'hideInactiveSlides' : true,
-			'legacyIEMode' : $('html').is('.ie6, .ie7, .ie8'),
+			'legacyIEMode' : jQuery('html').is('.ie6, .ie7, .ie8'),
 
 			'height' : null,
 			'width' : null,
@@ -61,9 +61,9 @@
 	 */
 	var CKSlider = function (node, options) {
 
-		this.options = $.extend({}, defaults, options || {});
+		this.options = jQuery.extend({}, defaults, options || {});
 
-		this.$container = $(node).eq(0);
+		this.$container = jQuery(node).eq(0);
 		this.$slides = this.$container.find("." + this.options.slideClass);
 		this.$indicatorContainer = this.$container.find(this.options.slideIndicatorWrapper);
 		this.$indicators = this.$indicatorContainer.find(this.options.slideIndicatorElement);
@@ -114,12 +114,12 @@
 
 			this.$slides.each(function (i) {
 				if (i === self.current || !self.options.hideInactiveSlides) {
-					$(this).show();
+					jQuery(this).show();
 				} else {
-					$(this).hide();
+					jQuery(this).hide();
 				}
 
-				$(this).css({
+				jQuery(this).css({
 					position : 'absolute',
 					height : self.height,
 					width : '100%'
@@ -213,7 +213,7 @@
 				key = diff;
 			}
 			if (key >= this.slideCount) {
-				diff = key - this.slideCount
+				diff = key - this.slideCount;
 				key = diff;
 			}
 			return key;
@@ -330,7 +330,9 @@
 				currentKey, nextKey, currentSlide, nextSlide, def;
 
 			//Same as current key? Bail...
-			if (key === this.getCurrentKey() || this.animationLock) return;
+			if (key === this.getCurrentKey() || this.animationLock) {
+				return;
+			}
 
 			this.animationLock = true;
 
@@ -343,7 +345,7 @@
 			nextSlide = this.getSlideAtKey(key);
 
 			//Trigger public method
-			$.when(this.options.onBeforeTransition.apply(this, [currentSlide, nextSlide, nextKey])).then(function () {
+			jQuery.when(this.options.onBeforeTransition.apply(this, [currentSlide, nextSlide, nextKey])).then(function () {
 				var here = self,
 					cKey = currentKey,
 					nKey = nextKey,
@@ -413,7 +415,7 @@
 
 		fadeToSlide : function (key) {
 			var self = this,
-				def = new $.Deferred(),
+				def = new jQuery.Deferred(),
 				$currentSlide = this.getCurrentSlide(),
 				$nextSlide = this.getSlideAtKey(key);
 
@@ -484,29 +486,31 @@
 			//Prev/Next
 			this.$nextBtn.click(function (e) {
 				e.preventDefault();
-				self.trigger('ms.next')
+				self.trigger('ms.next');
 				return false;
 			});
 			this.$prevBtn.click(function (e) {
 				e.preventDefault();
-				self.trigger('ms.prev')
+				self.trigger('ms.prev');
 				return false;
 			});
 
 			//Indicators
 			this.$indicators.each(function (i) {
 				var there = self;
-				$(this).click(function (e) {
+				jQuery(this).click(function (e) {
 					e.preventDefault();
 					there.trigger('ms.goTo', [i]);
 					return false;
-				})
+				});
 			});
 
 			//Pause on click
 			if (this.options.pauseOnClick) {
 				this.$container.click(function (e) {
+					e.preventDefault();
 					self.trigger('ms.stop');
+					return false;
 				});
 			}
 		},
@@ -523,8 +527,8 @@
 
 
 			//Next & prev events
-			this.on('ms.next', $.proxy(this.onNext, this));
-			this.on('ms.prev', $.proxy(this.onPrev, this));
+			this.on('ms.next', jQuery.proxy(this.onNext, this));
+			this.on('ms.prev', jQuery.proxy(this.onPrev, this));
 
 			//Go direct to slide events
 			this.on('ms.goTo', function (e, key) {
@@ -532,14 +536,14 @@
 				self.transitionToSlide(key);
 			});
 
-			this.on('ms.start', $.proxy(this.onStart, this));
-			this.on('ms.stop', $.proxy(this.stopAutoplay, this));
+			this.on('ms.start', jQuery.proxy(this.onStart, this));
+			this.on('ms.stop', jQuery.proxy(this.stopAutoplay, this));
 		},
 
 		preloadImages : function (nodes) {
-			$(nodes).each(function () {
+			jQuery(nodes).each(function () {
 				var img = document.createElement("img");
-				img.src = $(this).attr('src');
+				img.src = jQuery(this).attr('src');
 			});
 		}
 	};
@@ -551,7 +555,7 @@
 	 * @param options
 	 * @returns {Array|Object|boolean}
 	 */
-	$.fn.ckslider = function (options) {
+	jQuery.fn.ckslider = function (options) {
 		var a = [];
 		this.each(function () {
 			a.push(new CKSlider(this, options));
