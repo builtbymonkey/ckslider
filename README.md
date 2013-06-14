@@ -102,9 +102,16 @@ The slider requires some basic CSS scaffolding
 
 ```css
 .slider {
+	position: relative;
+}
+.slider, .slide {
 	height: 400px;
 	width: 700px;
-	position: relative;
+}
+.slide {
+	position: absolute;
+	left:0;
+	right:0;
 }
 ```
 
