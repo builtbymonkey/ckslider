@@ -1,0 +1,27 @@
+{
+  "name": "ckslider",
+  "title": "ckSlider",
+  "description": "Flexible jquery content slider",
+  "version": "0.1.0",
+  "homepage": "https://github.com/ckimrie/ckslider",
+  "author": {
+    "name": "Christopher Imrie",
+    "email": "ckimrie@gmail.com",
+    "url": "http://christopherimrie.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ckimrie/ckslider.git"
+  },
+  "bugs": "https://github.com/ckimrie/ckslider/issues",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/ckimrie/ckslider/blob/master/LICENSE-MIT"
+    }
+  ],
+  "dependencies": {
+    "jquery": "1.7"
+  },
+  "keywords": []
+}
