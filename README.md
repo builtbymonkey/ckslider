@@ -29,33 +29,36 @@ Complete list of configuration options and defaults:
 ```javascript
 defaultConfig  = {
 	'fadeInDuration' : 800,
+	'slideDuration' : 800,
 	'delay' : 5000,
 	'start' : 1,
-	'transition' : 'fade',
+	'transition' : 'fade', //Accepts 'fade' or 'slide'
 	'autoplay' : true,
+	'interactionDisablesAutoplay': true,
 	'preloadImages' : true,
+	'slideInactiveOpacity': 0.5,
 	'inactiveZIndex' : 1,
 	'zIndexLayer1' : 5,
 	'zIndexLayer2' : 10,
 	'zIndexLayer3' : 15,
 	'pauseOnClick' : true,
 	'hideInactiveSlides' : true,
-	'legacyIEMode' : $('html').is('.ie6, .ie7, .ie8'), //Assumes H5BP HTML tag class convention
-
+	'legacyIEMode' : jQuery('html').is('.ie6, .ie7, .ie8'),
+	
 	'height' : null,
 	'width' : null,
-
+	
 	'loadingClass' : 'loading',
 	'slideActiveClass' : 'active',
 	'slideClass' : 'slide',
 	'indicatorActiveClass' : 'active',
-
+	
 	'slideIndicatorWrapper' : '.counter',
 	'slideIndicatorElement' : 'a',
-
+	
 	'nextBtn' : '.next',
 	'prevBtn' : '.previous',
-
+	
 	'direction' : 'forward',
 	'onStart' : function () {
 	},
@@ -64,6 +67,7 @@ defaultConfig  = {
 	'onAfterTransition' : function () {
 	},
 	'onPause' : function () {
+	}
 };
 ```
 
