@@ -160,4 +160,5 @@ $(document).ready(function($) {
 
 ## Release History
 
+* 0.2 Added slide transition
 * 0.1 Public Release

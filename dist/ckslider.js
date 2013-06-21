@@ -1,14 +1,17 @@
-/*! ckSlider - v0.1.0 - 2013-06-14
+/*! ckSlider - v0.2.0 - 2013-06-21
 * https://github.com/ckimrie/ckslider
 * Copyright (c) 2013 Christopher Imrie; Licensed MIT */
 (function () {
 	var defaults = {
 			'fadeInDuration' : 800,
+			'slideDuration' : 800,
 			'delay' : 5000,
 			'start' : 1,
 			'transition' : 'fade',
 			'autoplay' : true,
+			'interactionDisablesAutoplay': true,
 			'preloadImages' : true,
+			'slideInactiveOpacity': 0.5,
 			'inactiveZIndex' : 1,
 			'zIndexLayer1' : 5,
 			'zIndexLayer2' : 10,
@@ -60,8 +63,8 @@
 		this.$slides = this.$container.find("." + this.options.slideClass);
 		this.$indicatorContainer = this.$container.find(this.options.slideIndicatorWrapper);
 		this.$indicators = this.$indicatorContainer.find(this.options.slideIndicatorElement);
-		this.$nextBtn = this.$indicatorContainer.find(this.options.nextBtn);
-		this.$prevBtn = this.$indicatorContainer.find(this.options.prevBtn);
+		this.$nextBtn = this.$container.find(this.options.nextBtn);
+		this.$prevBtn = this.$container.find(this.options.prevBtn);
 
 		this.slideCount = this.$slides.length;
 		this.current = this.options.start > 0 && this.options.start < this.$slides.length ? this.options.start - 1 : 0;
@@ -122,6 +125,22 @@
 			this.$indicatorContainer.css({
 				'zIndex' : this.options.zIndexLayer3
 			});
+			
+			if(this.options.transition === "slide") {
+				var $prevSlide = this.getPrevSlide(),
+					$nextSlide = this.getNextSlide();
+	
+				//Prep layering and position
+				$prevSlide.css({
+					'zIndex' : this.options.zIndexLayer1,
+					'left' : -1 * this.width
+				}).fadeTo(this.options.slideDuration, this.options.slideInactiveOpacity);
+	
+				$nextSlide.hide().css({
+					'zIndex' : this.options.zIndexLayer2,
+					'left' : this.width
+				}).fadeTo(this.options.slideDuration, this.options.slideInactiveOpacity);
+			}
 
 			this.highlightIndicator(this.getCurrentKey());
 		},
@@ -274,7 +293,9 @@
 			}, this.options.delay);
 		},
 
-
+		/**
+		 * Ends autoslide
+		 */
 		stopAutoplay : function () {
 			clearTimeout(this.autoplayTimeout);
 			this.options.autoplay = false;
@@ -445,6 +466,97 @@
 				this.autoplay();
 			}
 		},
+		
+		/*
+		 * ------------------------------------------------------
+		 *  Slide Transition
+		 * ------------------------------------------------------
+		 */
+		slideToSlide : function (key) {
+			var self = this,
+				direction = this.getDirectionBetweenKeys(this.getCurrentKey(), key),
+				def = new jQuery.Deferred(),
+				$prevSlide = this.getPrevSlide(),
+				$currentSlide = this.getCurrentSlide(),
+				$nextSlide = this.getSlideAtKey(key),
+				$nextNextSlide = this.getSlideAtKey(this.getNthRelativeKey(2)),
+				directionPrefix = this.direction === constants.DIRECTION_FORWARD ? "-=" : "+=";
+
+
+			//Prep layering and position
+			if(direction === constants.DIRECTION_FORWARD){
+				$prevSlide.css({
+					'zIndex' : this.options.zIndexLayer1,
+					'left' : -1 * this.width
+				});
+				$currentSlide.css({
+					'zIndex' : this.options.zIndexLayer1,
+					'left' : 0
+				});
+	
+				$nextSlide.css({
+					'zIndex' : this.options.zIndexLayer2,
+					'left' : this.width
+				});
+				$nextNextSlide.css({
+					'zIndex' : this.options.zIndexLayer1,
+					'left' : this.width * 2
+				});
+			} else {
+				$prevSlide.css({
+					'zIndex' : this.options.zIndexLayer1,
+					'left' : this.width
+				});
+				$currentSlide.css({
+					'zIndex' : this.options.zIndexLayer1,
+					'left' : 0
+				});
+	
+				$nextSlide.css({
+					'zIndex' : this.options.zIndexLayer2,
+					'left' : this.width * -1
+				});
+				$nextNextSlide.css({
+					'zIndex' : this.options.zIndexLayer1,
+					'left' : this.width * -2
+				});
+			}
+			 
+			//Slide
+			jQuery().add($currentSlide).add($nextSlide).add($nextNextSlide).add($prevSlide).animate({
+				left: directionPrefix + this.width
+			},{
+				queue: false,
+				duration: this.options.slideDuration,
+				complete: function () {
+					self.postSlide($currentSlide, $nextSlide, $nextNextSlide);
+					def.resolve();
+				}
+			});
+			$prevSlide.fadeOut({
+				queue: false,
+				duration: this.options.slideDuration
+			});
+			$currentSlide.fadeTo(this.options.slideDuration, this.options.slideInactiveOpacity);
+			$nextSlide.fadeTo(this.options.slideDuration, 1);
+			$nextNextSlide.fadeTo(this.options.slideDuration, this.options.slideInactiveOpacity);
+
+			return def;
+		},
+
+
+		/**
+		 * Post slide event
+		 * 
+		 * @param $currentSlide
+		 * @param $nextSlide
+		 */
+		postSlide : function () {
+			//Autoplay
+			if (this.options.autoplay) {
+				this.autoplay();
+			}
+		},
 
 
 		/*
@@ -479,12 +591,24 @@
 			//Prev/Next
 			this.$nextBtn.click(function (e) {
 				e.preventDefault();
+				if(self.direction !== "forward") {
+					self.direction = "forward";
+				}
+				if(self.options.interactionDisablesAutoplay) {
+					self.stopAutoplay();
+				}
 				self.trigger('ms.next');
 				return false;
 			});
 			this.$prevBtn.click(function (e) {
 				e.preventDefault();
-				self.trigger('ms.prev');
+				if(self.direction !== "reverse") {
+					self.direction = "reverse";
+				}
+				if(self.options.interactionDisablesAutoplay) {
+					self.stopAutoplay();
+				}
+				self.trigger('ms.next');
 				return false;
 			});
 
@@ -557,4 +681,3 @@
 		return a.length > 1 ? a : a.length === 1 ? a[0] : false;
 	};
 })();
-
