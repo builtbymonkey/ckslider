@@ -20,20 +20,45 @@
       throws(block, [expected], [message])
   */
 
-  module('jQuery.ckslider', {
-    // This will run before each test in this module.
-    setup: function() {
-      this.slider = $('#qunit-fixture').ckslider();
-    }
-  });
+  module('jQuery.ckslider');
 
 
 //
-  test('ckslider initialises', function() {
-    expect(2);
-	ok(this.slider, "as non null object");
-	equal(this.slider.slideCount, 3, "has 3 slides");
-  });
+	test('ckslider initialises', function() {
+		var slider = $('.slider').ckslider();
+		
+		expect(2);
+		ok(slider, "as non null object");
+		equal(slider.slideCount, 3, "has 3 slides");
+	});
+	
+	
+	test('default markup and classes added', function(){
+		var slider;
+			
+		$(".slider").addClass("loading");
+		slider = $(".slider").ckslider();
+		
+		equal(slider.$container.hasClass("loading"), false, "root loading class removed on load");
+	});
+	
+	test('default css applied', function(){
+		var slider = $(".slider").ckslider();
+		
+		equal(slider.$container.css("position"), "relative", "root loading class removed on load");
+		
+		$.each(slider.$slides, function(i, item){
+			equal($(item).css('position'), 'absolute', "Slide " + i + " is absolutely positioned");
+			
+			//Fist Slide is visible
+			if(i === 0) {
+				equal($(item).css('position'), 'absolute', "slide " + i + " is visible");
+			} else {
+				equal($(item).css('display'), 'none', "slide " + i + " is visible");
+			}
+		});
+	});
+
 //
 //  module('jQuery.awesome');
 //
